@@ -128,7 +128,9 @@ function App() {
           {/* <div>key (WIF): {wif}</div> */}
           {/* <div>key (descriptor(WIF)#checksum): {wifDescriptor}</div> */}
           <br/>
-          <div>Hex or WIF key can be imported into Unisat via "Create a new wallet" &gt; "Restore from single private key"</div>
+          <div>Hex
+            {/* or WIF */}
+            key can be imported into Unisat via "Create a new wallet" &gt; "Restore from single private key"</div>
           <button onClick={() => setKey("")}>Reset</button>
         </>
       )}
