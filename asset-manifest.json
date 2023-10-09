@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/ordswap-recover-metamask/static/js/main.fbb43ceb.js",
+    "index.html": "/ordswap-recover-metamask/index.html",
+    "main.fbb43ceb.js.map": "/ordswap-recover-metamask/static/js/main.fbb43ceb.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.fbb43ceb.js"
+  ]
+}
