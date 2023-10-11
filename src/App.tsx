@@ -2,8 +2,8 @@ import { ethers } from "ethers";
 import { HDKey } from "@scure/bip32";
 import { hex } from "@scure/base";
 import { useCallback, useState } from "react";
-// import { WIF } from "micro-btc-signer";
-// import { utils } from "@noble/secp256k1";
+import { WIF } from "micro-btc-signer";
+import { utils } from "@noble/secp256k1";
 
 const defaultPath = "m/86'/0'/0'/0/0";
 
@@ -82,8 +82,8 @@ export function descriptorWithChecksum(desc: string): string {
 
 function App() {
   const [key, setKey] = useState("");
-  // const wif = key ? WIF().encode(utils.hexToBytes(key)) : null;
-  // const wifDescriptor = wif ? descriptorWithChecksum(`tr(${wif})`) : null;
+  const wif = key ? WIF().encode(utils.hexToBytes(key)) : null;
+  const wifDescriptor = wif ? descriptorWithChecksum(`tr(${wif})`) : null;
 
   const connectMetamask = useCallback(async () => {
     const TAPR0OT_MESSAGE =
@@ -125,12 +125,11 @@ function App() {
       {key && (
         <>
           <div>key (Hex): {key}</div>
-          {/* <div>key (WIF): {wif}</div> */}
-          {/* <div>key (descriptor(WIF)#checksum): {wifDescriptor}</div> */}
+          <div>key (WIF): {wif}</div>
+          <div>key (descriptor(WIF)#checksum): {wifDescriptor}</div>
           <br/>
           <div>
-            Hex key can be imported into <a href="https://unisat.io/download" rel="noreferrer" target="_blank">Unisat</a> via "Create a new wallet" &gt; "Restore from single private key"
-            {/* or WIF */}
+            Hex or WIF key can be imported into <a href="https://unisat.io/download" rel="noreferrer" target="_blank">Unisat</a> via "Create a new wallet" &gt; "Restore from single private key"
           </div>
           <br/>
           <button onClick={() => setKey("")}>Reset</button>
