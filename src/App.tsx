@@ -80,10 +80,18 @@ export function descriptorWithChecksum(desc: string): string {
   return `${descParts[1]}#${checksum}`;
 }
 
+function Key(props: { k: string }) {
+  const { k } = props;
+  return <>
+    <div>key (Hex): {k}</div>
+    <div>key (WIF): {WIF().encode(utils.hexToBytes(k))}</div>
+    <div>key (descriptor(WIF)#checksum): {descriptorWithChecksum(`tr(${WIF().encode(utils.hexToBytes(k))})`)}</div>
+  </>
+}
+
 function App() {
   const [key, setKey] = useState("");
-  const wif = key ? WIF().encode(utils.hexToBytes(key)) : null;
-  const wifDescriptor = wif ? descriptorWithChecksum(`tr(${wif})`) : null;
+  const [altKey, setAltKey] = useState("");
 
   const connectMetamask = useCallback(async () => {
     const TAPR0OT_MESSAGE =
@@ -108,33 +116,44 @@ function App() {
     if (!address) return;
 
     const toSign = "0x" + getBitcoinKeySignContent(TAPR0OT_MESSAGE);
-    const signature = await provider.send("personal_sign", [toSign, address.toString()]);
+    const signature = ethers.utils.arrayify(await provider.send("personal_sign", [toSign, address.toString()]));
 
-    const seed = ethers.utils.arrayify(ethers.utils.keccak256(ethers.utils.arrayify(signature)));
-
-    const hd = HDKey.fromMasterSeed(seed);
+    let seed = ethers.utils.arrayify(ethers.utils.keccak256(signature));
+    let hd = HDKey.fromMasterSeed(seed);
     const key = hd.derive(defaultPath);
-
     setKey(hex.encode(key.privateKey!))
+console.log(signature)
+    // altkey
+    let lastByte = signature[signature.length - 1]
+    console.log(signature, lastByte)
+
+    if (lastByte > 1) {
+      lastByte -= 27;
+      signature[signature.length - 1] = lastByte
+    }
+
+
+    seed = ethers.utils.arrayify(ethers.utils.keccak256(signature));
+    hd = HDKey.fromMasterSeed(seed);
+    const altKey = hd.derive(defaultPath);
+    setAltKey(hex.encode(altKey.privateKey!))
   }, [setKey]);
   return (
     <div>
       <div>This tool recovers your Ordswap private key from Metamask.</div>
-      <br/>
+      <br />
       {!key && <button onClick={connectMetamask}>Connect Metamask</button>}
-      {key && (
-        <>
-          <div>key (Hex): {key}</div>
-          <div>key (WIF): {wif}</div>
-          <div>key (descriptor(WIF)#checksum): {wifDescriptor}</div>
-          <br/>
-          <div>
-            Hex or WIF key can be imported into <a href="https://unisat.io/download" rel="noreferrer" target="_blank">Unisat</a> via "Create a new wallet" &gt; "Restore from single private key"
-          </div>
-          <br/>
-          <button onClick={() => setKey("")}>Reset</button>
-        </>
-      )}
+      {key && <Key k={key} />}
+      <br />
+      {altKey && <Key k={altKey} />}
+      <br />
+      {key &&
+        <div>
+          Hex or WIF key can be imported into <a href="https://unisat.io/download" rel="noreferrer" target="_blank">Unisat</a> via "Create a new wallet" &gt; "Restore from single private key"
+        </div>
+      }
+      <br />
+      {key && <button onClick={() => (setKey(""), setAltKey(""))}>Reset</button>}
     </div>
   );
 }
