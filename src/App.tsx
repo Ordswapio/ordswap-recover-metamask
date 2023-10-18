@@ -122,17 +122,13 @@ function App() {
     let hd = HDKey.fromMasterSeed(seed);
     const key = hd.derive(defaultPath);
     setKey(hex.encode(key.privateKey!))
-console.log(signature)
+
     // altkey
     let lastByte = signature[signature.length - 1]
-    console.log(signature, lastByte)
-
     if (lastByte > 1) {
       lastByte -= 27;
       signature[signature.length - 1] = lastByte
     }
-
-
     seed = ethers.utils.arrayify(ethers.utils.keccak256(signature));
     hd = HDKey.fromMasterSeed(seed);
     const altKey = hd.derive(defaultPath);
